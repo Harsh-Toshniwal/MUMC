@@ -1,7 +1,7 @@
 import argparse
 import os
 import sys
-import ruamel_yaml as yaml
+import yaml
 import time
 import datetime
 import json
@@ -118,12 +118,13 @@ def main(args, config):
         pos_embed_reshaped = interpolate_pos_embed(state_dict['visual_encoder.pos_embed'], model.visual_encoder)
         state_dict['visual_encoder.pos_embed'] = pos_embed_reshaped
 
-        if not args.evaluate:
-            if config['distill']:
-                m_pos_embed_reshaped = interpolate_pos_embed(state_dict['visual_encoder_m.pos_embed'],
-                                                             model.visual_encoder_m)
-                state_dict['visual_encoder_m.pos_embed'] = m_pos_embed_reshaped
+        # Also reshape momentum encoder position embedding if it exists
+        if 'visual_encoder_m.pos_embed' in state_dict:
+            m_pos_embed_reshaped = interpolate_pos_embed(state_dict['visual_encoder_m.pos_embed'],
+                                                         model.visual_encoder_m)
+            state_dict['visual_encoder_m.pos_embed'] = m_pos_embed_reshaped
 
+        if not args.evaluate:
             for key in list(state_dict.keys()):
                 if 'bert' in key:
                     encoder_key = key.replace('bert.', '')
@@ -159,6 +160,8 @@ def main(args, config):
     start_epoch = 0
     print("\nStart training\n")
     start_time = time.time()
+    
+    prefix = args.checkpoint.split('/')[-1].split('.')[0] if args.checkpoint else 'model'
 
     for epoch in range(start_epoch, config['max_epoch']):
         if not args.evaluate:
@@ -168,6 +171,13 @@ def main(args, config):
             cosine_lr_schedule(optimizer, epoch, config['max_epoch'], config['init_lr'], config['min_lr'])
 
             train(model, train_loader, optimizer, epoch, device, config)
+
+        # Run evaluation
+        if args.evaluate or utils.is_main_process():
+            vqa_result = evaluation(model, test_loader, device, config)
+            result_file = os.path.join(args.result_dir, '%s_vqa_result_%s.json' % (prefix, epoch))
+            json.dump(vqa_result, open(result_file, 'w'))
+            print(f"Results saved to: {result_file}")
 
         if args.evaluate:
             break
@@ -180,11 +190,8 @@ def main(args, config):
                 # 'config': config,
                 # 'epoch': epoch,
             }
-            prefix = args.checkpoint.split('/')[-1].split('.')[0]
             if args.is_save_path and epoch > 20:
                 torch.save(save_obj, os.path.join(args.output_dir, '%s_rad_%02d.pth' % (prefix, epoch)))
-            vqa_result = evaluation(model, test_loader, device, config)
-            json.dump(vqa_result, open(os.path.join(args.result_dir, '%s_vqa_result_%s.json' % (prefix, epoch)), 'w'))
 
         if args.distributed:
             dist.barrier()
@@ -218,7 +225,12 @@ if __name__ == '__main__':
 
     args.output_dir = '/mnt/sda/lpf/weights/output/V2/vqa/' + args.dataset_use + args.output_suffix
 
-    config = yaml.load(open('./configs/VQA.yaml', 'r'), Loader=yaml.Loader)
+    with open('./configs/VQA.yaml', 'r') as f:
+        config = yaml.safe_load(f)
+    
+    # Convert string learning rates to float
+    config['init_lr'] = float(config['init_lr'])
+    config['min_lr'] = float(config['min_lr'])
 
     args.result_dir = os.path.join(args.output_dir, 'result')
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)

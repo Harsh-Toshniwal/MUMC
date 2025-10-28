@@ -49,7 +49,6 @@ from transformers.modeling_outputs import (
 )
 from transformers.modeling_utils import (
     PreTrainedModel,
-    apply_chunking_to_forward,
     find_pruneable_heads_and_indices,
     prune_linear_layer,
 )
@@ -505,9 +504,7 @@ class BertLayer(nn.Module):
                 attention_output = cross_attention_outputs[0]
                 outputs = outputs + cross_attention_outputs[
                                     1:-1]  # add cross attentions if we output attention weights
-        layer_output = apply_chunking_to_forward(
-            self.feed_forward_chunk, self.chunk_size_feed_forward, self.seq_len_dim, attention_output
-        )
+        layer_output = self.feed_forward_chunk(attention_output)
         outputs = (layer_output,) + outputs
 
         outputs = outputs + (present_key_value,)
@@ -867,7 +864,6 @@ class BertModel(BertPreTrainedModel):
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="bert-base-uncased",
         output_type=BaseModelOutputWithPoolingAndCrossAttentions,
         config_class=_CONFIG_FOR_DOC,
@@ -1357,7 +1353,6 @@ class BertForMaskedLM(BertPreTrainedModel):
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="bert-base-uncased",
         output_type=MaskedLMOutput,
         config_class=_CONFIG_FOR_DOC,
@@ -1562,7 +1557,6 @@ class BertForSequenceClassification(BertPreTrainedModel):
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="bert-base-uncased",
         output_type=SequenceClassifierOutput,
         config_class=_CONFIG_FOR_DOC,
@@ -1646,7 +1640,6 @@ class BertForMultipleChoice(BertPreTrainedModel):
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, num_choices, sequence_length"))
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="bert-base-uncased",
         output_type=MultipleChoiceModelOutput,
         config_class=_CONFIG_FOR_DOC,
@@ -1740,7 +1733,6 @@ class BertForTokenClassification(BertPreTrainedModel):
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="bert-base-uncased",
         output_type=TokenClassifierOutput,
         config_class=_CONFIG_FOR_DOC,
@@ -1829,7 +1821,6 @@ class BertForQuestionAnswering(BertPreTrainedModel):
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="bert-base-uncased",
         output_type=QuestionAnsweringModelOutput,
         config_class=_CONFIG_FOR_DOC,

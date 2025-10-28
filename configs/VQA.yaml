@@ -1,8 +1,8 @@
 rad:
-  train_file: [ '/mnt/sda/lpf/data/vqa/data_RAD/trainset.json' ]
-  test_file: [ '/mnt/sda/lpf/data/vqa/data_RAD/testset.json' ]
-  answer_list: '/mnt/sda/lpf/data/vqa/data_RAD/answer_all_list.json'
-  vqa_root: '/mnt/sda/lpf/data/vqa/data_RAD/images/'  # vqa_rad
+  train_file: [ 'D:/USC/Deep Learning/MUMC/ofs_dataset/trainset.json' ]
+  test_file: [ 'D:/USC/Deep Learning/MUMC/ofs_dataset/testset.json' ]
+  answer_list: 'D:/USC/Deep Learning/MUMC/ofs_dataset/answer_list.json'
+  vqa_root: 'D:/USC/Deep Learning/MUMC/ofs_dataset/images/'  # vqa_rad
 pathvqa:
   train_file: [ '/mnt/sda/lpf/data/vqa/data_PathVQA/pathvqa_train.json',
                 '/mnt/sda/lpf/data/vqa/data_PathVQA/pathvqa_val.json' ]
@@ -39,4 +39,4 @@ init_lr: 2e-5
 weight_decay: 0.05
 #min_lr: 0
 min_lr: 1e-8
-max_epoch: 40
+max_epoch: 2
