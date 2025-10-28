@@ -81,18 +81,3 @@ python3 train_vqa.py --dataset_use rad --checkpoint ./pretrain/med_pretrain_29.p
 
 ## Pretrained weights
 You can download the pre-trained weights through the following [link](https://drive.google.com/file/d/1ZxwjfDeBYTMpw4mN_R9-gAcR9UOJiAFb/view?usp=sharing).
-
-## Citation:
-```
-@article{MUMC,
-  title     = {Masked Vision and Language Pre-training with Unimodal and Multimodal Contrastive Losses for Medical Visual Question Answering},
-  author    = {Pengfei Li, Gang Liu, Jinlong He, Zixu Zhao and Shenjun Zhong},
-  booktitle = {Medical Image Computing and Computer Assisted Intervention -- MICCAI 2023},
-  year      = {2023},
-  pages     = {374--383},
-  publisher = {Springer Nature Switzerland}
-}
-```
-
-## License
-MIT License
