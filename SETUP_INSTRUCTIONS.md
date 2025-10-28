@@ -61,7 +61,7 @@ The model supports three medical VQA datasets:
 1. **Official source**: https://osf.io/89kps/
 2. **Alternative**: https://physionet.org/content/vqa-rad/ (requires registration)
 
-Download the dataset and extract to a folder (e.g., `ofs_dataset/`).
+Download the dataset and extract to a folder (e.g., `data_RAD/`).
 
 #### Preprocess Dataset
 
@@ -86,10 +86,10 @@ Edit `configs/VQA.yaml` and update the `rad` section with your local paths:
 
 ```yaml
 rad:
-  train_file: ['D:/path/to/ofs_dataset/trainset.json']
-  test_file: ['D:/path/to/ofs_dataset/testset.json']
-  answer_list: 'D:/path/to/ofs_dataset/answer_list.json'
-  vqa_root: 'D:/path/to/ofs_dataset/images/'
+  train_file: ['D:/path/to/data_RAD/trainset.json']
+  test_file: ['D:/path/to/data_RAD/testset.json']
+  answer_list: 'D:/path/to/data_RAD/answer_list.json'
+  vqa_root: 'D:/path/to/data_RAD/images/'
 ```
 
 **Important**: Use forward slashes (`/`) in paths, even on Windows.
